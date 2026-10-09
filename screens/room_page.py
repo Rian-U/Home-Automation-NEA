@@ -35,6 +35,7 @@ class RoomPage:
         # remove button (created when needed)
         self.remove_button = None
         self.remove_slot_idx = None
+        self.selected_slot_idx = None
 
         if not self.room_image_path:
             candidate1 = os.path.join("assets", "rooms", f"{self.map_name}_{self.room_name}.png")
@@ -109,10 +110,14 @@ class RoomPage:
                     # toggle on/off for this slot
                     self.slots[idx]["on"] = not self.slots[idx].get("on", False)
                     print(f"[ROOM] Toggled slot {idx} ('{self.slots[idx]['name']}') -> {self.slots[idx]['on']}")
+                    # clear selection for other slots
+                    self.selected_slot_idx = None
                     return
 
                 if rect.collidepoint(event.pos):
                     slot = self.slots[idx]
+                    # set selected slot for stats display
+                    self.selected_slot_idx = idx
                     if slot["item"]:
                         # show remove button for this slot
                         self.show_remove_for_slot(idx)
@@ -121,6 +126,8 @@ class RoomPage:
                         # clicking empty slot does nothing here — drop handled in main
                         print(f"[ROOM] slot '{slot['name']}' clicked (empty) - ready for drop")
                     return
+            # clicked in room but not on any slot -> clear selection
+            self.selected_slot_idx = None
 
     def handle_remove_event(self, event):
         """Forward events to the remove button (if visible)."""
@@ -188,6 +195,9 @@ class RoomPage:
                 else:
                     self._draw_item_text(item, rect)
 
+            # overlay for room stats handled by main draw overlay (drawn on top)
+            pass
+
         # draw back button
         self.back_button.draw(self.screen)
 
@@ -228,6 +238,15 @@ class RoomPage:
         while txt and f.size(txt + '…')[0] > max_w:
             txt = txt[:-1]
         return f.render((txt + '…') if txt else '…', True, (230,230,230))
+
+    def get_selected_slot_info(self):
+        """Return (rect, item) for selected_slot_idx if any, else (None, None)."""
+        if self.selected_slot_idx is None:
+            return None, None
+        idx = self.selected_slot_idx
+        rect = self._slot_rect(idx)
+        item = self.slots[idx].get('item')
+        return rect, item
 
 # if any default slot category strings exist replace them, e.g.:
     {"name": "Slot 1", "category": "ElectricsAndThermo"},

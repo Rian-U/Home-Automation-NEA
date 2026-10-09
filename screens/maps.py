@@ -16,12 +16,12 @@ ROOMS = {
         "bedroom2": pygame.Rect(480, 190, 200, 110),
     },
     "Map 2": {
-        "bedroom": pygame.Rect(60, 60, 180, 100),
-        "bathroom": pygame.Rect(260, 60, 180, 100),
-        "office": pygame.Rect(460, 60, 180, 100),
-        "living_room": pygame.Rect(60, 180, 180, 100),
-        "dining": pygame.Rect(260, 180, 180, 100),
-        "kitchen": pygame.Rect(460, 180, 180, 100),
+        "bedroom": pygame.Rect(100, 90, 180, 100),
+        "bathroom": pygame.Rect(290, 80, 180, 100),
+        "office": pygame.Rect(490, 90, 180, 100),
+        "bedroom2": pygame.Rect(100, 270, 180, 100),
+        "living_room": pygame.Rect(490, 250, 180, 100),
+        "kitchen": pygame.Rect(320, 340, 180, 100),
     },
     "Map 3": {
         "bedroom": pygame.Rect(80, 80, 160, 90),
@@ -172,6 +172,33 @@ class Map:
             item = self.room_items.get(name)
             if item:
                 pygame.draw.circle(self.screen, (0, 0, 255), rect.center, min(rect.w, rect.h)//6)
+            # render room name centered inside the rect
+            try:
+                display_name = name.replace('_', ' ').title()
+                # choose font size proportional to rect height
+                base_size = max(12, min(24, rect.h // 5))
+                font = pygame.font.SysFont(None, base_size)
+                txt_surf = font.render(display_name, True, (255, 255, 255))
+                # shrink until it fits within rect (with padding)
+                pad = 8
+                while txt_surf.get_width() > rect.w - pad and base_size > 10:
+                    base_size -= 1
+                    font = pygame.font.SysFont(None, base_size)
+                    txt_surf = font.render(display_name, True, (255, 255, 255))
+
+                # draw semi-transparent background behind label for readability
+                bg_w = txt_surf.get_width() + 8
+                bg_h = txt_surf.get_height() + 6
+                label_surf = pygame.Surface((bg_w, bg_h), pygame.SRCALPHA)
+                label_surf.fill((20, 20, 20, 180))
+                # blit background then text centered
+                lx = rect.centerx - bg_w // 2
+                ly = rect.centery - bg_h // 2
+                self.screen.blit(label_surf, (lx, ly))
+                self.screen.blit(txt_surf, (rect.centerx - txt_surf.get_width() // 2, rect.centery - txt_surf.get_height() // 2))
+            except Exception:
+                # be silent on render errors
+                pass
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEMOTION:
