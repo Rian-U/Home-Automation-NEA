@@ -22,7 +22,7 @@ A Python-based home automation simulation developed for my A-Level Computer Scie
 
 ## How It Works
 
-The user registers or logs in to proceed with the menu selection. The user has the option to choose among any three house plans that will be explored. Rooms can be configured, and a compatible appliance can be placed in any slot.
+The user registers or logs in to select a menu option. The user can choose any three house plans to explore. Rooms can be configured, and a compatible appliance can be placed in any slot.
 
 During the simulation, active appliances are included in the overall energy consumption and cost of electricity. At the end of each simulated day, a summary report is provided together with recommendations on how to improve energy efficiency.
 
